@@ -29,12 +29,14 @@ local BACKGROUND_LOOPING_POINT = 413
 
 local bird = Bird()
 
---local pipes = {} LETS NOT USE THAT
+-- local pipes = {} LETS NOT USE THAT
 local pipePairs = {}
 
 local lastY = -PIPE_HEIGHT + math.random(80) + 20
 
 local spawnTimer = 0
+
+local scrolling = true
 
 function love.load()
     love.window.setTitle('Flappy Bird')
@@ -71,29 +73,42 @@ function love.keyboard.wasPressed(key)
 end
 
 function love.update(dt) -- UPDATE FUNCTION
-    backgroundScroll = (backgroundScroll + BACKGORUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
-    
-    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
+    if scrolling then
+        backgroundScroll = (backgroundScroll + BACKGORUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
 
-    spawnTimer = spawnTimer + dt
+        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
 
-    if spawnTimer > 2 then
-        local y = math.max(-PIPE_HEIGHT + 10, math.min(lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
-        lastY = y
+        spawnTimer = spawnTimer + dt
 
-        table.insert(pipePairs, PipePair(y))
-        spawnTimer = 0
-    end
+        if spawnTimer > 2 then
+            local y = math.max(-PIPE_HEIGHT + 10,
+                math.min(lastY + math.random(-20, 20), VIRTUAL_HEIGHT - 90 - PIPE_HEIGHT))
+            lastY = y
 
-    bird:update(dt)
+            table.insert(pipePairs, PipePair(y))
+            spawnTimer = 0
+        end
 
-    for k, pair in pairs(pipePairs) do
-        pair:update(dt)
-    end
+        bird:update(dt)
 
-    for k, pair in pairs(pipePairs) do
-        if pair.remove then
-            table.remove(pipePairs, k)
+        for k, pair in pairs(pipePairs) do
+            pair:update(dt)
+            
+            for l, pipe in pairs(pair.pipes) do
+                if bird:doCollide(pipe) then
+                    scrolling = false
+                end
+            end
+
+            if pair.x < -PIPE_WIDTH then
+                pair.remove = true
+            end
+        end
+
+        for k, pair in pairs(pipePairs) do
+            if pair.remove then
+                table.remove(pipePairs, k)
+            end
         end
     end
 
