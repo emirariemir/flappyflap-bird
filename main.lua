@@ -4,6 +4,8 @@ Class = require 'class'
 
 require 'Bird'
 
+require 'Pipe'
+
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
@@ -25,6 +27,10 @@ local BACKGROUND_LOOPING_POINT = 413
 
 local bird = Bird()
 
+local pipes = {}
+
+local spawnTimer = {}
+
 function love.load()
     love.window.setTitle('Flappy Bird')
 
@@ -33,6 +39,10 @@ function love.load()
         fullscreen = false,
         resizable = true
     })
+
+    math.randomseed(os.time())
+
+    love.keyboard.keysPressed = {}
 end
 
 function love.resize(w, h)
@@ -40,17 +50,29 @@ function love.resize(w, h)
 end
 
 function love.keypressed(key)
+    love.keyboard.keysPressed[key] = true
+
     if key == 'escape' then
         love.event.quit()
     end
 end
 
-function love.update(dt)
+function love.keyboard.wasPressed(key)
+    if love.keyboard.keysPressed[key] then
+        return true
+    else
+        return false
+    end
+end
+
+function love.update(dt) -- UPDATE FUNCTION
     backgroundScroll = (backgroundScroll + BACKGORUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
     
     groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % VIRTUAL_WIDTH
 
     bird:update(dt)
+
+    love.keyboard.keysPressed = {}
 end
 
 function love.draw()
