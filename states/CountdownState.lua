@@ -28,5 +28,6 @@ end
 
 function CountdownState:render()
     love.graphics.setFont(hugeFont)
+    hugeFont:setFilter('nearest','nearest')
     love.graphics.printf(tostring(self.count), 0, 120, VIRTUAL_WIDTH, 'center')
 end
