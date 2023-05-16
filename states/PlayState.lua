@@ -47,7 +47,9 @@ function PlayState:update(dt)
     for k, pair in pairs(self.pipePairs) do
         for l, pipe in pairs(pair.pipes) do
             if self.bird:doCollide(pipe) then
-                gStateMachine:change('title')
+                gStateMachine:change('score', {
+                    score = self.score
+                })
             end
         end
     end
