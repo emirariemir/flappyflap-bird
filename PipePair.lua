@@ -10,6 +10,8 @@ function PipePair:init(y)
         ['lower'] = Pipe('bottom', self.y + PIPE_HEIGHT + GAP_HEIGHT)
     }
     self.remove = false -- whether this pipe pair is ready to be removed from the scene
+
+    self.scored = false
 end
 
 function PipePair:update(dt)
